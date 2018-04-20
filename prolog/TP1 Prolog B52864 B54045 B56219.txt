@@ -1,0 +1,327 @@
+﻿% ------------------------------------------------------------------------
+%
+% UCR - Facultad de Ingenieria - ECCI
+% CI_1441 Paradigmas Computacionales
+% I-2018, Prof. Dr. Alvaro de la Ossa
+% B52864 Carlos Gamboa Vargas
+% B54045 Hernan Madrigal Otarola
+% B56219 Fernando Rojas Meléndez
+% Tarea Programada I
+%
+% ------------------------------------------------------------------------
+
+
+% --- cabeza (+L,-C) -----------------------------------------------------
+%          L es una lista
+%          C es la cabeza de esa lista
+% --- ejemplo: cabeza([a,b,c],X) -> X  = a -------------------------------
+
+
+cabeza([A|Ar],A).
+
+
+% --- cola (+L,-C) -------------------------------------------------------
+%          L es una lista
+%          C es la cola de esa lista
+% --- ejemplo: cola([a,b,c],X) -> X  = [b,c] -----------------------------
+
+
+cola([A|Ar],Ar).
+
+
+% --- igualar (+L,-C) ----------------------------------------------------
+%          L es una lista
+%          C es la misma lista
+% --- ejemplo: igualar([a,b,c],X) -> X  = [a,b,c] ------------------------
+
+
+igualar(A,A).
+
+
+% --- sacarultimo (+L,-C) ------------------------------------------------
+%          L es una lista
+%          C es la lista sin el ultimo elemento
+% --- ejemplo: sacarultimo([a,b,c],X) -> X  = [a,b] ----------------------
+
+
+sacarultimo([X|[]],[]).
+
+
+sacarultimo([Cab|Col],[Cab|Z]):-    sacarultimo(Col,Z).
+
+
+% --- ultimo (+L,-X) -----------------------------------------------------
+%          L es una lista
+%          X es el ultimo elemento de la lista
+% --- ejemplo: ultimo([a,b,c],X) -> X  = [c] -----------------------------
+
+
+ultimo([X|[]],X).
+
+
+ultimo(L,U):-     cola(L,C),
+                            ultimo(C,U).
+                            
+% --- rotarizquierda (+L,-X) ---------------------------------------------
+%          L es una lista
+%          X es la lista rotada a la izquierda
+% --- ejemplo: rotarizquierda([a,b,c],X) -> X  = [b,c,a] -----------------
+            
+rotarizquierda([Cabeza|Resto],L) :-     append(Resto,[Cabeza],L).
+
+
+% --- rotarderecha (+L,-X) -----------------------------------------------
+%          L es una lista
+%          X es la lista rotada a la derecha
+% --- ejemplo: rotarderecha([a,b,c],X) -> X  = [c,a,b] -------------------
+
+
+rotarderecha(L,R) :-     ultimo(L,U),
+                                            sacarultimo(L,T),
+                                            append([U],T,R).
+
+
+% --- reversa (+L,-X) ----------------------------------------------------
+%          L es una lista
+%          X es la lista en reversa
+% --- ejemplo: reversa([a,b,c],X) -> X  = [c,b,a] ------------------------                                            
+ reversa([X],[X]).
+ reversa([X|M],Z) :- reversa(M,T), append(T,[X],Z), !.
+
+
+% --- bpp (+N,+A,-S) -----------------------------------------------------
+%         S es el sub arbol de A cuya raiz es N
+%         S debe ser nil si el sub arbol no existe
+% --- ejemplo: bpp(d,[a,b,[c,d,e],[f,[g,h],i]],X) -> X  = d --------------
+
+
+bpp(N,A,S) :-     is_list(N),                % Validacion N es un atomo
+                    write("Error: El parametro N debe ser un atomo."),
+                    !,
+                    fail.
+
+
+bpp(N,A,S) :-     not(is_list(A)),           % Validacion A es un arbol
+                    write("Error: El parametro A debe ser un arbol."),
+                    !,
+                    fail.
+
+
+                    
+bpp(N,[X|C],S) :-          is_list(X),     % Si C es lista devuelve todo el
+                                                                    %subarbol.
+                        cabeza(X,Cab),
+                        Cab = N,
+                        write(N),            % Escribe la cabeza del arbol
+                        write("a"),
+                        igualar(X,S),
+                        !.                        % Evitar backtracking
+
+
+bpp(N,[N|C],S) :-     write(N),             % Escribe la cabeza del arbol
+                        S = [N],            % El resultado es el arbol
+                        !.                       % Evitar backtracking
+
+
+bpp(N,[X|_],S) :-     is_list(X),           % Si la cabeza del arbol es una lista
+                        bpp(N,X,S),          % El arbol es la cabeza de la lista.
+                        !.                      % Evitar backtracking
+
+
+bpp(N,[X|C],S) :-          is_list(X),     % Si la cabeza del arbol es una lista
+                        bpp(N,C,S),           % El arbol es la cola de la lista
+                        !.                         % Evitar backtracking
+
+
+
+
+bpp(N,[X|C],S) :-          not(is_list(X)),    % Si la cabeza es un atomo
+                        write(X),                   % Escribe la cabeza del arbol
+                        bpp(N,C,S),                    % El arbol es la cola de la lista
+                        !.                            % Evitar backtracking
+                        
+bpp(N,[X|C],S):-        is_list(X),                 % Si la cabeza es lista y no entro en ningun caso anterior
+                        igualar([],S),            % No lo encontro en el arbol
+                        !.
+
+
+
+
+
+
+% --- bap (+N,+A,-S) -----------------------------------------------------
+%         S es el sub arbol de A cuya raiz es N
+%         nil si el sub arbol no existe
+% --- ejemplo: bap(d,[a,b,[c,d,e],[f,[g,h],i]],X) -> X = d ---------------
+
+
+bap(N,A,S) :-   is_list(N),                    % Validacion N es un atomo
+                    write("Error: El parametro N debe ser un atomo."),
+                    !,
+                    fail.
+
+
+bap(N,A,S) :-   not(is_list(A)),     % Validacion A es un arbol
+                    write("Error: El parametro A debe ser un arbol."),
+                    !,
+                    fail.
+
+
+bap(N,[N|Nr],S) :- write(N),            % Escribe la cabeza del arbol
+                    S = [N],                     % El resultado es el arbol
+                    !.                             % Evitar backtracking
+
+
+bap(N,[X|[]],S):-          igualar([],S),     % No lo encontro en el arbol
+                        !.
+                    
+bap(N,[X|Xr],S) :-     is_list(X),            % Si la cabeza del arbol es una lista
+                        cabeza(X,Cab),
+                        Cab = N,
+                        write(Cab),
+                        igualar(X,S),
+                        !.
+
+
+bap(N,[X|Xr],S) :-    not(is_list(X)),    % Si la cabeza es un atomo
+                        write(X),                   % Escribe la cabeza del arbol
+                        bap(N,Xr,S),            % El arbol es la cola de la lista
+                        !.                            % Evitar backtracking
+                        
+bap(N,[X|Xr],S) :-  is_list(X),                  % Si la cabeza del arbol es una lista
+                        cabeza(X,Cab),
+                        write(Cab),
+                        cola(X,Col),
+                        append(Xr,Col,Lis),
+                        bap(N,Lis,S),            % El arbol es la cabeza de la lista.
+                        !.                            % Evitar backtracking
+
+
+
+
+% --- potencia (+C,-P) ---------------------------------------------------
+%         P es el conjunto potencia de C
+% --- ejemplo: potencia([a,b,c],X) -> X = [nil,[a],[b],[c],[a,b],[a,c],[b,   %         c],[a,b,c]] --------------------------------------------------------
+
+
+potencia(C,P) :-        not(is_list(C)),
+                        write("Error: El parametro C debe ser un conjunto."),
+                        !,
+                        fail.
+potencia([], []).
+potencia([X|C], P) :-     potencia(C,P).
+potencia([X|C], [X|P]) :-     potencia(C,P).
+
+
+
+
+
+
+% --- cartesiano (+A,+B,-C) ----------------------------------------------
+%         C es el producto cartesiano de A y B
+% --- ejemplo: cartesiano([a,b,c],[d,e],X) -> X = [[a,d],[a,e],[b,d],[b,e]                  
+%         ,[c,d],[c,e]] ------------------------------------------------------
+
+
+cartesiano(A,B,C) :-        not(is_list(A)),
+                            write("Error: El parametro A debe ser un conjunto."),
+                            !,
+                            fail.
+                        
+cartesiano(A,B,C) :-        not(is_list(B)),
+                            write("Error: El parametro B debe ser un conjunto."),
+                            !,
+                            fail.
+                                            
+cartesiano([],_,[]).          
+          
+cartesiano([A|Ar], [B|Br], C) :-    cartesiano2(A, [B|Br], Cab),
+                                                                    cartesiano(Ar, [B|Br], Cola),  append(Cab,Cola,C), !.
+                                    
+cartesiano2(_,[],[]).
+
+
+cartesiano2(A, [B|Br], [[A,B]|D]) :-     cartesiano2(A,Br, D).
+
+
+
+
+
+
+% --- encripta (+He,+Ae,+As,-Hs,-Ef) -------------------------------------
+%         Hs es el resultado de encriptar la hilera de entrada He con un  
+%         engranaje formado por los alfabetos de entrada (Ae) y salida (As)
+%         Ef es el estado final de la m ́aquina, formado por el par [ae,as],
+%         donde ae y as son los s ́ımbolos de los alfabetos de entrada y
+%         salida, respectivamente, en los que qued ́o la m ́aquina luego de
+%         encriptar He.
+% ------------------------------------------------------------------------
+
+
+
+
+                        
+encripta([],Ae,As,[],Y):-     cabeza(As,CabA),
+                                cabeza(Ae,CabE),
+                                append([CabE],[CabA],Y).    % Obtiene el estado final                
+                        
+encripta(He,Ae,As,Hs,Ef):-     cabeza(He,CabE),
+                                cabeza(Ae,CabA),
+                                CabE \= CabA,                            
+                                rotarizquierda(As,Runo),
+                                rotarderecha(Ae,Rdos),
+                                encripta(He,Rdos,Runo,Hs,Ef),!.
+                        
+encripta(He,Ae,As,Hs,Ef) :- cabeza(As,CabA),
+                                cabeza(Ae,CabE),
+                                cola(He,Col),
+                                encripta(Col,Ae,As,H,Ef),
+                                                    append([CabA],H,Hs),!.            % Construye la hilera encriptada
+
+
+
+
+
+
+% --- decripta (+Hs,+Ae,+As,+Ef,-He) -------------------------------------
+%         Decodifica la hilera encriptada Hs usando los alfabetos Ae y As,
+%         iniciando en la posici ́on del engranaje descrita por el estado final  
+%         de  la  maquina (Ef) cuando se encripto la hilera que produjo la
+%         hilera Hs. decripta devuelve en He la hilera decodificada.
+% ------------------------------------------------------------------------
+decripta([],Ae,As,[],[]).
+
+
+decripta(Hs,Ae,As,[],He):-     cabeza(Hs,CabE),
+                                cabeza(As,CabS),
+                                CabE \= CabS,
+                                rotarderecha(As,Runo),
+                                rotarizquierda(Ae,Rdos),
+                                decripta(Hs,Rdos,Runo,[],He),!.
+                                
+decripta(Hs,Ae,As,[],He):-     cabeza(As,CabA),
+                                cabeza(Ae,CabE),
+                                cola(Hs,Col),
+                                decripta(Col,Ae,As,[],H),
+                                append(H,[CabE],He),!.                    % Construye la hilera decriptada
+
+
+decripta(Hs,Ae,As,Ef,He):-     cabeza(Ef,Cab),
+                                cola(Ef,Temp),
+                                cabeza(Temp,Cola),
+                                cabeza(Ae,CabE),
+                                cabeza(As,CabS),
+                                Cab = CabE,
+                                Cola = CabS,
+                                                    reversa(Hs,T),
+                                decripta(T,Ae,As,[],He),!.            % Si ya se encontro el estado final
+                                
+decripta(Hs,Ae,As,Ef,He):-     cabeza(Ef,Cab),
+                                cola(Ef,Temp),
+                                cabeza(Temp,Cola),
+                                cabeza(Ae,CabE),
+                                cabeza(As,CabS),
+                                (Cab \= CabE; Cola \= CabS),
+                                rotarizquierda(As,Runo),
+                                rotarderecha(Ae,Rdos),
+                                decripta(Hs,Rdos,Runo,Ef,He),!.    % Rota hasta llegar al estado final
