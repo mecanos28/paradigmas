@@ -1,0 +1,2 @@
+# paradigmas
+tps paradigmas
