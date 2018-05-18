@@ -1,0 +1,1 @@
+antes de correr la simulación digite en el explorador el nombre del archivo que se va a generar
