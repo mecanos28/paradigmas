@@ -15,23 +15,81 @@
 ;; A. Funciones de manejo/procesamiento de listas:
 ;;
 ;;    (tamano l)          -> cantidad de elementos de la lista l
+(defun tamano2 (l)
+	(cond
+		((eq l nil) 0)
+		(t (+ 1 (tamano2 (cdr l))))
+	)
+)
 ;;
 ;;    (nesimo n l)        -> n-esimo elemento de la lista l
+(defun nesimo2 (n l)
+	(cond
+		((eq n 1) (car l))
+		(t (nesimo2 (- n 1) (cdr l)))
+	)
+)
+
 ;;
 ;;    (miembro x l)       -> t si x es elemento de la lista l, nil si no
-;;
+
+(defun miembro1 (x l)
+	(cond
+		((eq x (car l)) t)
+		((eq nil l) nil)
+		(t (miembro1 x (cdr l)))
+	)
+)
 ;;    (miembro* x l)      -> la sublista de l en la que aparece x a la cabeza,
 ;;                           nil si no
+(defun miembro*1 (x l)
+	(cond
+		((and (listp (car l)) (eq x (caar l))) (car l))
+		((eq nil l) nil)
+		(t (miembro*1 x (cdr l)))
+	)
+)
+
 ;;
 ;;    (maximo l)          -> el maximo elemento en la lista de numeros l
 ;;
+(defun maximo1 (l)
+	(maximo2 0 l)
+)
+
+(defun maximo2 (x l)
+	(cond
+		((null l) x)
+		((> (car l) x) (maximo2 (car l) (cdr l)))
+		(t (maximo2 x (cdr l)))
+	)
+)
+
 ;;    (maximo* l)         -> auxiliar de maximo que incluye una variable
 ;;                           temporal para llevar cuenta del maximo
 ;;
+
 ;;    (concatena l1 l2)   -> la concatenacion de l1 y l2
-;;
+(defun concatena1 (l1 l2)
+	(append l1 l2)
+)
+
 ;;    (reemplaza x y l)   -> la lista que resulta de reemplazar en la lista l
 ;;                           todas las ocurrencias de x por y
+(defun reemplaza1 (x y l)
+	(cond
+		((null l) nil)
+		((eq (car l) x) (cons y (reemplaza1 x y (cdr l))))
+		(t (cons (car l) (reemplaza1 x y (cdr l))))
+	)
+)
+
+(defun reemplaza (viejo l nuevo)
+   (cond ((null l) nil)
+         ((equal viejo (car l)) (cons nuevo
+                                      (reemplaza viejo (cdr l) nuevo)))
+         (t (cons (car l)
+                  (reemplaza viejo (cdr l) nuevo)))))
 ;;
 ;;    (reversa l)         -> la lista reversa de la lista l
 ;;

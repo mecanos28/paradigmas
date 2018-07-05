@@ -1,7 +1,7 @@
 ;;------------------------------------------------------------------------------
 ;;
 ;; Universidad de Costa Rica
-;; Escuela de Ciencias de la Computación e Informática
+;; Escuela de Ciencias de la Computacin e Informtica
 ;; CI-1441 Paradigmas Computacionales
 ;; I-2018, Prof. Dr. Alvaro de la Ossa Osegueda
 ;;
@@ -16,59 +16,120 @@
 ;;
 ;; Suponga que existe una lista de acceso global de la forma ( .. (o p v) .. ),
 ;; denominada "propiedades", en la que cada terna (o p v) representa una
-;; propiedad p con valor v de un objeto o. Supongo además que para cada objeto y
+;; propiedad p con valor v de un objeto o. Supongo adems que para cada objeto y
 ;; propiedad pueden existir en esa lista varias ternas con valores distintos. Lo
 ;; que no puede haber son ternas repetidas.
 ;;
 ;; Ejemplo:
 
-(setq propiedades '( (tel1 color negro) (tel1 tamaño grande) (tel1 red 4g)
+(setq propiedades '( (tel1 color negro) (tel1 tama�o grande) (tel1 red 4g)
                      (tel2 color rojo) (tel2 red 3g)
-                     (tel3 tamaño mini) (tel3 red 4g) (tel3 marca patito)
+                     (tel3 tama�o mini) (tel3 red 4g) (tel3 marca patito)
                      (tel4 red 3g) (tel4 red 4g) (tel4 color gris) ))
 
-;; 1.1. Programe una función "prop", de dos parámetros, que reciba un objeto o
-;;      (átomo) y una propiedad p (átomo), y devuelve todos los valores v
+;; 1.1. Programe una funcin "prop", de dos parmetros, que reciba un objeto o
+;;      (tomo) y una propiedad p (tomo), y devuelve todos los valores v
 ;;      asociados a o y p (una lista).
 ;;
 ;; Ejemplo: (prop 'tel4 'red) -> (3g 4g)
 ;;
 ;; -->
 
-;; 1.2. Programe una función "nprop" (de "nueva propiedad"), que reciba un
-;;      un objeto (átomo), una propiedad (átomo) y un valor (cualquier
-;;      expresión), añada la terna formada por estos tres elementos a la lista
+(defun prop (o p) 
+	(prop* o p propiedades)
+)
+
+(defun prop* (o p l) 
+	(cond ((null l) nil)
+	((and (eq (caar l) o)(eq (cadar l) p))
+		(cons (caddar l) (prop* o p (cdr l))) 
+	)
+	(t (prop* o p (cdr l)))
+	)
+)
+
+;; 1.2. Programe una funcin "nprop" (de "nueva propiedad"), que reciba un
+;;      un objeto (tomo), una propiedad (tomo) y un valor (cualquier
+;;      expresin), a�ada la terna formada por estos tres elementos a la lista
 ;;      global de propiedades y devuelva la terna.
 ;;
 ;; Ejemplo: (nprop 'tel1 'marca 'forro) -> (tel1 marca forro)
 ;;
 ;; -->
 
-;; 1.3. Programe una función "xprop", que reciba un objeto (átomo) y una
-;;      propiedad (átomo) y elimine de la lista "propiedades" todas las ternas
+(defun nprop (o p v)
+	(setf propiedades (append propiedades (cons (list o p v) nil) 
+                       ))
+	(list o p v)
+)
+
+;; 1.3. Programe una funcin "xprop", que reciba un objeto (tomo) y una
+;;      propiedad (tomo) y elimine de la lista "propiedades" todas las ternas
 ;;      correspondientes y devuelva la lista de ternas eliminadas.
 ;;
 ;; Ejemplo: (xprop 'tel4 'red) -> ((tel4 red 3g) (tel4 red 4g))
 ;;
 ;; -->
 
-;; 1.4. Programa una función "similares", que reciba una propiedad (átomo) y un
-;;      valor (cualquier expresión), y devuelve la lista de objetos que tienen
+(defun xprop (o p) 
+	(setf propiedades (xprop* o p propiedades)
+	)
+)
+
+(defun xprop* (o p l) 
+	(cond ((null l) nil)
+	((and (eq (caar l) o)(eq (cadar l) p))
+		(xprop* o p (cdr l))
+	)
+	(t (cons (car l) (xprop* o p (cdr l))))
+	)
+)
+
+;; 1.4. Programa una funcin "similares", que reciba una propiedad (tomo) y un
+;;      valor (cualquier expresin), y devuelve la lista de objetos que tienen
 ;;      esa propiedad con ese valor.
 ;;
 ;; Ejemplo: (similares 'red '4g) -> (tel1 tel3 tel4)
 ;;
 ;; -->
 
+(defun similares (p v) 
+	(similares* p v propiedades)
+)
+
+(defun similares* (p v l) 
+	(cond ((null l) nil)
+	((and (eq (caddar l) v)(eq (cadar l) p))
+		(cons (caddar l) (similares* p v (cdr l))) 
+	)
+	(t (similares* p v (cdr l)))
+	)
+)
+
+
+
+(defun similares (p v) 
+	(similares* p v propiedades)
+)
+
+(defun similares* (p v l) 
+	(cond ((null l) nil)
+	((and (eq (cadar l) p)(eq (caddar l) v))
+		(cons (caar l) (similares* p v (cdr l))) 
+	)
+	(t (similares* p v (cdr l)))
+	)
+)
+
 ;;------------------------------------------------------------------------------
 ;;
 ;; 2. Las funciones setf y setq
 ;;
-;; Ejecute la llamada siguiente en el intérprete:
+;; Ejecute la llamada siguiente en el int�rprete:
 
 (setq x '(a b c d e))
 
-;; Después, compile las funciones siguientes:
+;; Despu�s, compile las funciones siguientes:
 
 (defun foo2 (val1 val2 cir)
    (foo2* val1 val2 cir (cdr cir)))
@@ -81,8 +142,8 @@
 (defun circular (lista)
    (setf (cdr (last lista)) lista))
 
-;; Finalmente, explique qué hace el intérprete, paso a paso, y a qué apunta
-;; la variable x al finalizar la evaluación de la llamada siguiente:
+;; Finalmente, explique qu� hace el int�rprete, paso a paso, y a qu� apunta
+;; la variable x al finalizar la evaluaci�n de la llamada siguiente:
 
 (and (circular x) (foo2 'c 'm x) (write (car x)) t)
 
@@ -90,7 +151,7 @@
 
 ;;------------------------------------------------------------------------------
 ;;
-;; 3. Explique qué hace la función siguiente.
+;; 3. Explique qu� hace la funci�n siguiente.
 ;;
 
 (defun foo3 (objeto1 objeto2 lista)
@@ -104,7 +165,7 @@
 
 ;;------------------------------------------------------------------------------
 ;;
-;; 4.a. ¿Qué hace la función foo?
+;; 4.a. �Qu� hace la funci�n foo?
 
 (defun foo (l1 l2 lim)
    (cond ((not (eq (length l1) (length l2))) 'error)
@@ -124,7 +185,7 @@
 
 ;; -->
 
-;; 4.b. Programe una función foo5*2 que haga lo mismo que foo*, pero sin usar
-;;      la función foon, ni la expresión lambda pasada como argumento a mapcar.
+;; 4.b. Programe una funci�n foo5*2 que haga lo mismo que foo*, pero sin usar
+;;      la funci�n foon, ni la expresi�n lambda pasada como argumento a mapcar.
 ;;
 ;; -->
